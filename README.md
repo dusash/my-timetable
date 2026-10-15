@@ -78,7 +78,8 @@
 到 [Releases](../../releases) 下载最新的 `.apk`，传到手机上点开安装即可。
 第一次装可能会提示「未知来源」，允许一下就行。
 
-> 安装包只有 10 MB 出头，不需要谷歌服务，安卓 5.0 以上都能装。
+> 按 CPU 架构分开打的包在 15～19 MB（现在的手机基本都是 `arm64-v8a`，下这个就行）；
+> 不分架构的通用包约 50 MB。不需要谷歌服务，安卓 5.0 以上都能装。
 
 ### 方式二：自己编译
 
@@ -95,6 +96,25 @@ flutter build apk --release  # 出一个能分享给别人的安装包
 ```
 
 打出来的包在 `build/app/outputs/flutter-apk/app-release.apk`。
+
+### 关于安装包签名
+
+仓库里**没有存放任何签名密钥**。直接 `flutter build apk --release` 打出来的包
+会用 Flutter 自带的调试证书签名 —— 自己装、发给同学装都没问题，
+但不能上架应用商店。
+
+要正式发布的话，自己生成一个 keystore，在 `android/key.properties` 里配好
+（`.gitignore` 已经把密钥文件排除掉，不会误传上去）：
+
+```properties
+storeFile=/绝对路径/my-release-key.jks
+storePassword=你的密码
+keyAlias=你的别名
+keyPassword=你的密码
+```
+
+然后到 `android/app/build.gradle.kts` 里，把 `release` 的 `signingConfig`
+换成你自己那份配置即可。
 
 ---
 
